@@ -1,32 +1,43 @@
-import { Component, Prop, h } from '@stencil/core';
-import { format } from '../../utils/utils';
+import { Component, Element, Host, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
-  styleUrl: 'my-component.css',
-  shadow: true,
+  styleUrl: 'my-component.css'
 })
 export class MyComponent {
-  /**
-   * The first name
-   */
-  @Prop() first: string;
+  @Element() el: HTMLElement;
 
-  /**
-   * The middle name
-   */
-  @Prop() middle: string;
+	@Prop({ reflect: true }) disablePadding: boolean;
+	@Prop({ reflect: true }) enableToolbar: boolean = true;
+	@Prop({ reflect: true }) showShadow: boolean = false;
 
-  /**
-   * The last name
-   */
-  @Prop() last: string;
+	private hasMenubar: boolean = false;
 
-  private getText(): string {
-    return format(this.first, this.middle, this.last);
-  }
-
+	getClassnames(): string {
+		const classes = [];
+		if (this.disablePadding) {
+			classes.push('my-app-footer-disable-padding');
+		}
+		if (this.showShadow || this.hasMenubar) {
+			classes.push('my-app-footer-has-shadow');
+		}
+		return classes.join(' ') || null;
+	}
   render() {
-    return <div>Hello, World! I'm {this.getText()}</div>;
+    return (
+      <Host class={this.getClassnames()}>
+        <ion-footer
+          class="ion-no-border"
+        >
+          {this.enableToolbar ? (
+            <ion-toolbar>
+              <slot />
+            </ion-toolbar>
+          ) : (
+            <slot />
+          )}
+        </ion-footer>
+      </Host>
+		);
   }
 }
